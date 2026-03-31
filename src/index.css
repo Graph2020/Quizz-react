@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+@theme {
+  --color-background: #f5f7fb;
+  --color-primary: #293264;
+}
+
+@utility main-btn {
+  @apply rounded-lg bg-[#4D5B9E] px-6 py-3 font-medium text-white;
+}
