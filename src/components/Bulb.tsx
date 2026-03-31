@@ -16,7 +16,7 @@ export default function Bulb({
 }: BulbProps): JSX.Element {
   return (
     <div
-      className="absolute size-80 rounded-full md:size-96 lg:size-110"
+      className="absolute size-80 rounded-full md:size-96 lg:size-110 xl:size-160"
       style={{
         backgroundColor: backgroundColor,
         top: top,
@@ -24,8 +24,6 @@ export default function Bulb({
         left: left,
         right: right,
       }}
-    >
-      Bulb
-    </div>
+    ></div>
   );
 }
