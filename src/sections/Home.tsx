@@ -15,7 +15,7 @@ export default function Home() {
         </p>
       </div>
       <button
-        className="main-btn px-8 py-4 lg:px-10"
+        className="main-btn cursor-pointer px-8 py-4 transition-transform hover:scale-105 lg:px-10"
         onClick={() => setShowQuestions(true)}
       >
         Start Quizz
