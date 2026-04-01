@@ -1,7 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AppContext } from "../App";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import shuffle from "shuffle-array";
 import clsx from "clsx";
+import type { JSX } from "react";
 interface Question {
   type: string;
   difficulty: string;
@@ -15,16 +18,31 @@ interface SelectedAnswer {
   [question: string]: string;
 }
 
-export default function Quizz() {
+export default function Quizz(): JSX.Element {
   const { showQuestions } = useContext(AppContext);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<SelectedAnswer>({});
+  const [restart, setRestart] = useState(false);
+  const containerRef = useRef<HTMLElement>(null);
   const isAllSelected =
     Object.keys(selectedAnswers).length === questions.length;
-  const answerValues = Object.values(selectedAnswers);
-
   const howManyIsRight = questions.filter(
-    (question, index) => question.correct_answer === answerValues[index],
+    (question) =>
+      question.correct_answer === selectedAnswers[question.question],
+  );
+
+  useGSAP(
+    () => {
+      if (questions.length === 0) return;
+
+      gsap.from(".question-card", {
+        opacity: 0,
+        y: 20,
+        ease: "power3.out",
+        stagger: 0.1,
+      });
+    },
+    { scope: containerRef, dependencies: [questions] },
   );
 
   useEffect(() => {
@@ -48,12 +66,12 @@ export default function Quizz() {
       }
     }
     fetchQuestions();
-  }, [showQuestions]);
+  }, [showQuestions, restart]);
 
   const displayQuestions = questions.map((question) => {
     return (
       <div
-        className="flex w-full flex-col items-start gap-4 border-b border-[#D6DBF5] pb-4"
+        className="question-card flex w-full flex-col items-start gap-4 border-b border-[#D6DBF5] pb-4"
         key={question.question}
       >
         <h2
@@ -70,7 +88,6 @@ export default function Quizz() {
             return (
               <button
                 onClick={() => {
-                  // Optional: Prevent changing answers after everything is selected
                   if (isAllSelected) return;
 
                   setSelectedAnswers({
@@ -97,12 +114,25 @@ export default function Quizz() {
   });
 
   return (
-    <section className="mx-auto flex w-full max-w-3xl flex-col gap-8 p-10 font-sans">
+    <section
+      ref={containerRef}
+      className="mx-auto flex w-full max-w-3xl flex-col gap-8 p-10 font-sans"
+    >
       {displayQuestions}
       {questions.length > 0 && isAllSelected && (
         <>
-          <button className="main-btn self-center px-2">New game</button>
-          <div>Correct answers: {howManyIsRight.length}</div>
+          <div className="text-primary text-2xl">
+            Correct answers: {howManyIsRight.length}
+          </div>
+          <button
+            onClick={() => {
+              setRestart(!restart);
+              setSelectedAnswers({});
+            }}
+            className="main-btn self-center px-2"
+          >
+            New game
+          </button>
         </>
       )}
     </section>
